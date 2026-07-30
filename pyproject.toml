@@ -1,0 +1,35 @@
+[project]
+name = "forge-motion"
+version = "0.1.0"
+description = "Motion planning and execution orchestration for Forge robotics dataflows."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+authors = [
+    { name = "X-ERA" }
+]
+dependencies = [
+    "forge-motion-server",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.14.0",
+]
+
+[tool.uv.workspace]
+members = [
+    "packages/motion_server",
+]
+
+[tool.uv.sources]
+forge-motion-server = { workspace = true }
+forge-msgs = { path = "../forge/packages/msgs" }
+forge-kinematics = { path = "../forge/packages/kinematics" }
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

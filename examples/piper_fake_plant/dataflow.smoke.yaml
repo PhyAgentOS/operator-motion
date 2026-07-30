@@ -1,0 +1,58 @@
+nodes:
+  - id: motion_action_client
+    path: uv
+    args: run --project ../.. python motion_action_client.py --config motion_server.yaml --result-file smoke-result.json --timeout-s 25
+    inputs:
+      tick: dora/timer/millis/20
+      joint_state: fake_joint_plant/joint_state
+      move_joints_feedback: motion_server/move_joints_feedback
+      move_joints_result: motion_server/move_joints_result
+      move_pose_feedback: motion_server/move_pose_feedback
+      move_pose_result: motion_server/move_pose_result
+    outputs:
+      - move_joints_goal
+      - move_joints_cancel
+      - move_pose_goal
+      - move_pose_cancel
+
+  - id: motion_server
+    path: uv
+    args: run --project ../.. forge-motion-server --config motion_server.yaml
+    inputs:
+      tick: dora/timer/millis/20
+      joint_state: fake_joint_plant/joint_state
+      move_joints_goal: motion_action_client/move_joints_goal
+      move_joints_cancel: motion_action_client/move_joints_cancel
+      move_pose_goal: motion_action_client/move_pose_goal
+      move_pose_cancel: motion_action_client/move_pose_cancel
+      trajectory_feedback: joint_trajectory_controller/trajectory_feedback
+      trajectory_result: joint_trajectory_controller/trajectory_result
+    outputs:
+      - move_joints_feedback
+      - move_joints_result
+      - move_pose_feedback
+      - move_pose_result
+      - trajectory_goal
+      - trajectory_cancel
+
+  - id: joint_trajectory_controller
+    path: uv
+    args: run --project ../../../controls forge-joint-trajectory-controller --config controller.yaml
+    inputs:
+      tick: dora/timer/millis/20
+      joint_state: fake_joint_plant/joint_state
+      trajectory_goal: motion_server/trajectory_goal
+      trajectory_cancel: motion_server/trajectory_cancel
+    outputs:
+      - joint_command
+      - trajectory_feedback
+      - trajectory_result
+
+  - id: fake_joint_plant
+    path: uv
+    args: run --project ../../../controls python ../../../controls/examples/joint_trajectory_controller/fake_joint_plant.py --period-ms 20 --response-gain 0.45
+    inputs:
+      tick: dora/timer/millis/20
+      joint_command: joint_trajectory_controller/joint_command
+    outputs:
+      - joint_state
