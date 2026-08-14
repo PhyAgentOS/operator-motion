@@ -73,3 +73,41 @@ forge-motion-server --config motion_server.yaml
 
 See `motion/examples/piper_fake_plant/` for a real four-process Dora smoke using Piper URDF
 FK/IK, the Forge joint trajectory controller, and a fake position plant.
+
+## Tool policy node
+
+The Motion Action policy node exposes `motion.server/move_joints|move_pose` through the Forge Tool
+protocol without changing `MotionServer` semantics:
+
+```text
+Forge Action Tool Wire
+        -> MotionActionEndpoint
+        -> Dora MoveJoints / MovePose Action
+        -> MotionServer
+             -> IK and motion planning
+             -> FollowJointTrajectory orchestration
+             -> settling and residual validation
+```
+
+`MotionActionEndpoint` is a protocol adapter: it owns Tool request parsing,
+`(invocation_id, attempt_id)` lifecycle, status/result/cancel/event mapping, and conversion to Dora
+Motion goals. It does not perform FK, IK, trajectory planning, controller orchestration, or final
+residual validation. Those remain exclusively in `MotionServer`.
+
+Unlike the one-shot Relative Pose Query, the existing Dora Motion Action is retained as a separate
+process boundary so native Dora callers can use MotionServer without Forge Tool/Gateway
+dependencies. This is a deployment decision, not a different layering model: both providers use an
+Endpoint adapter over a protocol-independent domain implementation.
+
+```bash
+forge-motion-action-policy
+```
+
+It implements start, cancel, status, result, and rate-limited events while delegating all planning
+and execution to the existing MotionServer Dora actions.
+
+See [TOOL_ENDPOINTS.md](TOOL_ENDPOINTS.md) for the Action descriptor, strict arguments, outputs, and
+ToolSpec example. Relative-to-absolute pose resolution is owned by the standalone
+[relative pose policy node](../../../policy_node/relative_pose_policy_node/README.md); its
+[Query contract](../../../policy_node/relative_pose_policy_node/TOOL_CONTRACTS.md) documents the
+relative input and absolute target-pose result.

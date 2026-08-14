@@ -31,6 +31,7 @@ def test_cache_reorders_extra_joints_and_estimates_velocity() -> None:
     assert snapshot is not None
     assert snapshot.positions == (0.2, -0.1)
     assert snapshot.velocities == pytest.approx((2.0, -1.0))
+    assert snapshot.version == 2
 
 
 def test_cache_rejects_missing_and_stale_state() -> None:

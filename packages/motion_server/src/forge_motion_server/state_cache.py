@@ -12,6 +12,7 @@ class JointStateSnapshot:
     positions: tuple[float, ...]
     velocities: tuple[float, ...]
     received_ns: int
+    version: int
 
 
 class JointStateCache:
@@ -21,6 +22,7 @@ class JointStateCache:
         self._positions: dict[str, float] = {}
         self._velocities: dict[str, float] = {}
         self._received_ns: int | None = None
+        self._version = 0
 
     @property
     def received_ns(self) -> int | None:
@@ -58,6 +60,7 @@ class JointStateCache:
         self._positions = {name: float(value) for name, value in positions.items()}
         self._velocities = velocities
         self._received_ns = now_ns
+        self._version += 1
 
     def snapshot(
         self,
@@ -75,4 +78,5 @@ class JointStateCache:
             positions=tuple(self._positions[name] for name in joint_names),
             velocities=tuple(self._velocities[name] for name in joint_names),
             received_ns=self._received_ns,
+            version=self._version,
         )
