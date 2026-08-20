@@ -4,7 +4,8 @@ import asyncio
 
 from forge_motion_server.action_endpoint import ACTION_DESCRIPTOR, MotionActionEndpoint
 from forge_motion_server.endpoint_lease import EndpointLease
-from forge_msgs import MoveJointsResult, ToolMessage
+from forge_msgs import MoveJointsResult
+
 from forge_tool import (
     EndpointRegistryResponse,
     ToolAccepted,
@@ -23,6 +24,7 @@ from forge_tool import (
     status_response_from_payload,
     validate_registration_envelope,
 )
+from forge_tool._tool_message import ToolMessage
 from forge_tool.dora import (
     DoraToolEndpointBinding,
     tool_envelope_to_message,

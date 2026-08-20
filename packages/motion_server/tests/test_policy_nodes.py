@@ -4,8 +4,9 @@ import asyncio
 
 from forge_motion_server.action_endpoint import MotionActionEndpoint
 from forge_motion_server.policy_nodes import MotionActionPolicyRunner
-from forge_msgs import ToolMessage
+
 from forge_tool import ToolContext, ToolExecutionKey, ToolRequest
+from forge_tool._tool_message import ToolMessage
 from forge_tool.dora import tool_message_to_envelope
 
 

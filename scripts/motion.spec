@@ -53,7 +53,10 @@ hiddenimports = list(dict.fromkeys(hiddenimports))
 def analysis(entry: str) -> Analysis:
     return Analysis(
         [str(SPEC_DIR / entry)],
-        pathex=[str(ROOT / "packages" / "motion_server" / "src")],
+        pathex=[
+            str(ROOT / "packages" / "motion_server" / "src"),
+            str(ROOT / "src"),
+        ],
         binaries=binaries,
         datas=datas,
         hiddenimports=hiddenimports,

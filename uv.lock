@@ -275,20 +275,16 @@ wheels = [
 
 [[package]]
 name = "forge-kinematics"
-version = "1.0.0"
-source = { directory = "../forge/packages/kinematics" }
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "pin" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "numpy", specifier = ">=2.0" },
-    { name = "pin", specifier = ">=3.0,<5" },
-    { name = "scipy", marker = "extra == 'least-squares'", specifier = ">=1.16,<2" },
+sdist = { url = "https://files.pythonhosted.org/packages/5b/61/e4f6700bfcdae6806f13df25103a065f7fd39072b864043f21008f3acf0c/forge_kinematics-1.0.1.tar.gz", hash = "sha256:0efecd47ce8bb5ec0fae2d83a8d7b33e66dfc3cc8b30cc0dce42f7b888d9e578", size = 32336, upload-time = "2026-08-13T16:24:51.98Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d4/67/13f1c2c1606d7de8835a1e9e4bb04a1ccb10584af24c11530ebf58837aab/forge_kinematics-1.0.1-py3-none-any.whl", hash = "sha256:5846cc1fef5eac1955bfb65c710f1325b14b5b11fd83bc10a2ad5a6d25d76fbf", size = 38016, upload-time = "2026-08-13T16:24:51.013Z" },
 ]
-provides-extras = ["least-squares"]
 
 [[package]]
 name = "forge-motion"
@@ -325,55 +321,35 @@ dependencies = [
     { name = "dora-rs" },
     { name = "forge-kinematics" },
     { name = "forge-msgs" },
-    { name = "forge-tool", extra = ["dora"] },
     { name = "numpy" },
+    { name = "pyarrow" },
     { name = "pyyaml" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "dora-rs", specifier = "==0.4.1" },
-    { name = "forge-kinematics", directory = "../forge/packages/kinematics" },
-    { name = "forge-msgs", editable = "../forge/packages/msgs" },
-    { name = "forge-tool", extras = ["dora"], directory = "../forge/packages/tool" },
+    { name = "forge-kinematics", specifier = "==1.0.1" },
+    { name = "forge-msgs", specifier = "==1.0.1" },
     { name = "numpy", specifier = ">=2.0" },
+    { name = "pyarrow", specifier = ">=15" },
     { name = "pyyaml", specifier = ">=6.0" },
 ]
 
 [[package]]
 name = "forge-msgs"
-version = "1.1.0"
-source = { editable = "../forge/packages/msgs" }
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "pillow" },
     { name = "pyarrow" },
     { name = "pydantic" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "numpy", specifier = ">=1.26,<3" },
-    { name = "pillow", specifier = ">=10,<13" },
-    { name = "pyarrow", specifier = ">=14,<24" },
-    { name = "pydantic", specifier = ">=2.0,<3" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=8.0.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/14/11/d80e481d07bd307dae709221090c0e6019f1a3d31b4e65babc23d8a5205b/forge_msgs-1.0.1.tar.gz", hash = "sha256:91b0421ad898a855d4f36ef1bda7c253e4c25cbf292919cc0ed2074572746bac", size = 24545, upload-time = "2026-08-13T16:22:50.44Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/92/79/f8ff3d369e0ac35ce1c01d0b46df695e5483a0c4e1fe2b6ac5ef3ffc8b86/forge_msgs-1.0.1-py3-none-any.whl", hash = "sha256:d3d01d576824a2c3944bb8117d1ff464c4a2f42c7395e8621f808800c2d2643d", size = 33395, upload-time = "2026-08-13T16:22:49.315Z" },
 ]
-provides-extras = ["test"]
-
-[[package]]
-name = "forge-tool"
-version = "0.1.0"
-source = { directory = "../forge/packages/tool" }
-
-[package.optional-dependencies]
-dora = [
-    { name = "forge-msgs" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "forge-msgs", marker = "extra == 'dora'", editable = "../forge/packages/msgs" }]
-provides-extras = ["dora"]
 
 [[package]]
 name = "iniconfig"

@@ -28,12 +28,17 @@ members = [
 
 [tool.uv.sources]
 forge-motion-server = { workspace = true }
-forge-msgs = { path = "../forge/packages/msgs", editable = true }
-forge-kinematics = { path = "../forge/packages/kinematics" }
-forge-tool = { path = "../forge/packages/tool" }
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 100
+extend-exclude = ["src/forge_tool"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# The package init prepends the vendored forge_tool source path before imports.
+"packages/motion_server/src/forge_motion_server/__init__.py" = ["E402"]
