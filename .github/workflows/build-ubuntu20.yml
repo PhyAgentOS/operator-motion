@@ -33,7 +33,8 @@ jobs:
             ca-certificates \
             curl \
             file \
-            git
+            git \
+            libgomp1
           rm -rf /var/lib/apt/lists/*
 
       - uses: actions/checkout@v6
