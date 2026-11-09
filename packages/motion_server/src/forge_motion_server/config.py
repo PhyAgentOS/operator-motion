@@ -26,6 +26,14 @@ class MotionGroupConfig:
     final_position_tolerance_m: float = 0.01
     final_orientation_tolerance_rad: float = 0.05
     ik_max_solution_joint_displacement: float | None = None
+    # Numerical accuracy is independent of the physical completion tolerance.
+    ik_position_tolerance_scale: float = 0.5
+    ik_position_tolerance_max_m: float = 0.002
+    ik_orientation_weight: float = 0.01
+    ik_damping: float = 0.1
+    ik_max_attempts: int = 8
+    ik_attempt_timeout_ms: int = 80
+    ik_seed_perturbation_rad: float = 0.35
 
     def __post_init__(self) -> None:
         if not isinstance(self.name, str) or not self.name:
@@ -83,13 +91,29 @@ class MotionGroupConfig:
         displacement = self.ik_max_solution_joint_displacement
         if displacement is not None and (not math.isfinite(displacement) or displacement <= 0.0):
             raise ValueError("ik_max_solution_joint_displacement must be finite and positive")
+        for key in (
+            "ik_position_tolerance_scale",
+            "ik_position_tolerance_max_m",
+            "ik_orientation_weight",
+            "ik_damping",
+            "ik_seed_perturbation_rad",
+        ):
+            value = getattr(self, key)
+            if isinstance(value, bool) or not math.isfinite(value) or value <= 0:
+                raise ValueError(f"{key} must be finite and positive")
+        if self.ik_position_tolerance_scale > 1:
+            raise ValueError("ik_position_tolerance_scale must not exceed one")
+        for key in ("ik_max_attempts", "ik_attempt_timeout_ms"):
+            value = getattr(self, key)
+            if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+                raise ValueError(f"{key} must be a positive integer")
 
 
 @dataclass(frozen=True, slots=True)
 class MotionServerConfig:
     groups: Mapping[str, MotionGroupConfig]
     state_timeout_ns: int = 200_000_000
-    planning_timeout_ns: int = 100_000_000
+    planning_timeout_ns: int = 1_000_000_000
     execution_timeout_margin_ns: int = 2_000_000_000
     final_state_timeout_ns: int = 200_000_000
     child_cancel_retry_ns: int = 100_000_000
@@ -161,7 +185,7 @@ def motion_server_config_from_mapping(
         groups=groups,
         state_timeout_ns=_milliseconds_to_ns(data.get("state_timeout_ms", 200), "state_timeout_ms"),
         planning_timeout_ns=_milliseconds_to_ns(
-            data.get("planning_timeout_ms", 100), "planning_timeout_ms"
+            data.get("planning_timeout_ms", 1000), "planning_timeout_ms"
         ),
         execution_timeout_margin_ns=_milliseconds_to_ns(
             data.get("execution_timeout_margin_ms", 2000),
@@ -195,6 +219,13 @@ def _group_from_mapping(name: str, data: dict[str, Any], root: Path) -> MotionGr
         "final_position_tolerance_m",
         "final_orientation_tolerance_rad",
         "ik_max_solution_joint_displacement",
+        "ik_position_tolerance_scale",
+        "ik_position_tolerance_max_m",
+        "ik_orientation_weight",
+        "ik_damping",
+        "ik_max_attempts",
+        "ik_attempt_timeout_ms",
+        "ik_seed_perturbation_rad",
     }
     _reject_unknown(data, allowed, f"group {name!r}")
     joint_names = _string_list(data.get("joint_names"), f"groups.{name}.joint_names")
@@ -232,6 +263,15 @@ def _group_from_mapping(name: str, data: dict[str, Any], root: Path) -> MotionGr
             data.get("ik_max_solution_joint_displacement"),
             "ik_max_solution_joint_displacement",
         ),
+        ik_position_tolerance_scale=float(data.get("ik_position_tolerance_scale", 0.5)),
+        ik_position_tolerance_max_m=float(data.get("ik_position_tolerance_max_m", 0.002)),
+        ik_orientation_weight=float(data.get("ik_orientation_weight", 0.01)),
+        ik_damping=float(data.get("ik_damping", 0.1)),
+        ik_max_attempts=_positive_int(data.get("ik_max_attempts", 8), "ik_max_attempts"),
+        ik_attempt_timeout_ms=_positive_int(
+            data.get("ik_attempt_timeout_ms", 80), "ik_attempt_timeout_ms"
+        ),
+        ik_seed_perturbation_rad=float(data.get("ik_seed_perturbation_rad", 0.35)),
     )
 
 

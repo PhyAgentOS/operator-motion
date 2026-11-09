@@ -65,6 +65,41 @@ handling accepts both flat metadata and a `parameters` envelope for compatibilit
 This package does not provide collision checking, a planning scene, Cartesian paths, OMPL,
 streaming servo control, or hard real-time motor control.
 
+## IK defaults and fallback
+
+Version 0.1.1 uses these defaults, including when a field is omitted from YAML:
+
+| Setting | Default | Meaning |
+| --- | ---: | --- |
+| `planning_timeout_ms` | 1000 | Total budget for one IK request |
+| `ik_position_tolerance_scale` | 0.5 | Numerical position tolerance / physical completion tolerance |
+| `ik_position_tolerance_max_m` | 0.002 | Upper bound on numerical position tolerance |
+| `ik_orientation_weight` | 0.01 | Orientation cost weight; acceptance still uses the requested angular tolerance |
+| `ik_damping` | 0.1 | Primary DLS damping |
+| `ik_max_attempts` | 8 | Maximum numerical searches before any trajectory is sent |
+| `ik_attempt_timeout_ms` | 80 | Budget per numerical search; successful searches return immediately |
+| `ik_seed_perturbation_rad` | 0.35 | Local alternate-seed search scale |
+
+`planning_timeout_ms` is a server setting; the `ik_*` fields belong to each
+configured group. Numerical position tolerance is the smaller of the scaled
+completion tolerance and the configured cap. Physical completion and requested
+orientation tolerance remain separate acceptance checks. Explicit settings
+override the defaults; robot-specific velocity, acceleration and URDF limits
+remain explicit.
+
+The search starts with DLS, then bounded nonlinear least squares, higher damping
+(`max(0.1, 2 * ik_damping)`) and a finite set of alternate seeds. Every accepted
+candidate is independently checked by FK against the requested tolerances and
+hard joint limits. Alternate seeds cannot bypass displacement limits relative
+to the original measured state. No approximate out-of-tolerance candidate is
+executed. An exhausted local search is not a proof of global unreachability.
+
+The optional hardware-free preflight helper uses the same solver for sequential
+application waypoints and sampled TCP-height checks. Its JSON-lines entrypoint
+is `python -m forge_motion_server.route_preflight --config motion_server.yaml`.
+It is not a Dora Node or a collision planner. See the bounded IK and route tests
+under `tests/` and `scripts/benchmark_ik.py` for offline validation.
+
 ## Run
 
 ```bash

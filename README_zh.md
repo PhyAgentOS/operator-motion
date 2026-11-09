@@ -37,11 +37,14 @@ Gateway -> motion_action_policy -> motion_server -> joint_trajectory_controller 
 ```
 
 `motion_action_policy` 管 Tool 生命周期和 Wire 参数转换；`motion_server` 管新鲜状态、FK/IK、轨迹及控制器编排。
+0.1.1 使用有界 IK 自动回退，并将数值位置求解精度与实际动作到位容差分开。
+另提供不访问硬件的 JSON-lines 预检程序 `python -m forge_motion_server.route_preflight`；
+它不新增生产 Node、Endpoint 或 Tool operation。
 两者是两个 Node，不能因 Endpoint 名含 `server` 而把 provider 路由接到计算 Node。
 参数、单位与校验以 [Action endpoint](packages/motion_server/src/forge_motion_server/action_endpoint.py)
 和 [motion_server 包说明](packages/motion_server/README.md)为准；关节值按关节类型使用 rad/m，位姿位置为 m。
 
-兼容性：当前依赖声明为 `dora-rs==0.4.1`、`forge-kinematics==1.0.1`、`forge-msgs==1.0.1`；以 [pyproject.toml](packages/motion_server/pyproject.toml) 与 [uv.lock](uv.lock) 为准。 Tool 协议实现为仓库内 vendored 代码。 这些声明不构成跨版本互操作保证；使用制品时还需核对 build revision 和 Skill lock。
+兼容性：当前依赖声明为 `dora-rs==0.4.1`、`forge-kinematics==1.0.1`、`forge-msgs==1.0.1`、`scipy>=1.14,<2`；以 [pyproject.toml](packages/motion_server/pyproject.toml) 与 [uv.lock](uv.lock) 为准。 Tool 协议实现为仓库内 vendored 代码。 这些声明不构成跨版本互操作保证；使用制品时还需核对 build revision 和 Skill lock。
 
 后续修改 Node 入口、Endpoint 或 Tool API 时，请同步更新本节及对应配置/契约，遵循 [Node README 规范](https://github.com/PhyAgentOS/forge/blob/master/CONTRIBUTING.md#node-readme-contract)。
 
@@ -54,6 +57,13 @@ Gateway -> motion_action_policy -> motion_server -> joint_trajectory_controller 
 
 Motion 决定配置的运动学组如何到达关节或笛卡尔目标，
 不承担物体操作语义、硬件协议、电机闭环或底层 `JointCommand` 生成。
+可选预检程序在 MotionServer Action 核心之外解释应用层 waypoint 名称，
+检查顺序 IK 和采样 TCP 高度，不提供全机器人碰撞检查。
+
+默认规划总预算为 1000 ms，数值 IK 位置精度为
+`min(动作到位容差 * 0.5, 0.002)` 米，姿态代价权重 0.01、DLS 阻尼 0.1。
+最多八次数值搜索，每次上限 80 ms，并共享总预算。省略配置即使用这些默认值，
+显式配置仍可覆盖。详见[配置与回退说明](packages/motion_server/README.md#ik-defaults-and-fallback)。
 
 完整 Piper 仿真对象联调示例见 `examples/piper_fake_plant/`。
 
