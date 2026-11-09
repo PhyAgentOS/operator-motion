@@ -88,6 +88,19 @@ PYTHONPATH=src uv run pytest -q
 `src/forge_tool`; see `THIRD_PARTY_NOTICES.md` for its provenance. Optional
 standalone executables can be built with `scripts/build_pyinstaller.sh`.
 
+## Linux release artifacts
+
+The manual **Build Ubuntu 20.04 binaries** workflow accepts a commit, branch or tag
+in `ref` and checks that both package versions match `version`. It builds and
+checks both CLIs in Ubuntu 20.04, then uploads the combined archive and separate
+single-executable archives for `motion_server` and `motion_action_policy`.
+Release assets also include SHA-256 checksums, the exact source commit and frozen
+runtime requirements. Use the separate archives for single-node installation;
+the combined archive contains both programs. Build success does not imply that
+the independent dependency audit passed. Version 0.1.1 retains an inherited
+Pillow 12.3.0 dependency whose audit currently fails; see the
+[verification update](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09).
+
 ## License
 
 [Apache License 2.0](LICENSE). Runtime dependencies are not distributed with

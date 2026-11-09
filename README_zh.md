@@ -79,6 +79,16 @@ PYTHONPATH=src uv run pytest -q
 `PYTHONPATH=src` 暴露 `src/forge_tool` 中内置的 Tool 协议；来源见 `THIRD_PARTY_NOTICES.md`。
 可选独立可执行文件通过 `scripts/build_pyinstaller.sh` 构建。
 
+## Linux 发布制品
+
+手动运行 **Build Ubuntu 20.04 binaries** 工作流时，`ref` 可指定提交、分支或标签；
+工作流校验两个包的版本都与 `version` 一致，在 Ubuntu 20.04 中构建并检查两个 CLI。
+输出包括合并压缩包，以及分别仅包含 `motion_server`、`motion_action_policy` 的单可执行文件压缩包。
+发布附件同时包含 SHA-256 校验值、精确源码提交和锁定的运行依赖清单。
+单 Node 安装使用独立压缩包，合并包包含两个程序。构建成功不代表独立的依赖审计已通过。
+0.1.1 保留了已有的 Pillow 12.3.0 依赖，当前依赖审计未通过，详见
+[验证更新](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09)。
+
 ## 许可证
 
 本仓库使用 [Apache License 2.0](LICENSE)。运行时依赖不随源码仓库分发，
