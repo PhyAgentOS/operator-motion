@@ -62,7 +62,7 @@ jobs:
               if actual != expected:
                   raise SystemExit(f"{name}: expected {expected}, got {actual}")
           PYCODE
-          git rev-parse HEAD > release-source-commit.txt
+          git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD > release-source-commit.txt
 
       - name: Build with PyInstaller
         run: ./scripts/build_pyinstaller.sh
