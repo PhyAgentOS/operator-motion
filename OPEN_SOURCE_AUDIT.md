@@ -2,6 +2,23 @@
 
 Audit date: 2026-08-20
 
+## 0.1.1 verification update (2026-11-09)
+
+Functional checks pass: 48 unit tests, repository lint, and both motion CLI
+imports. The original source snapshot was verified before preparing the release.
+
+The current locked runtime dependency audit **does not pass**: Pillow 12.3.0
+has 39 reported vulnerability records, with 13.0.0 listed as the fixed version.
+`forge-msgs==1.0.1` requires Pillow below 13; even the currently published
+`forge-msgs==2.0.0` retains that upper bound. This inherited dependency issue is
+not fixed by the IK changes. No audit exclusions, resolver overrides or forced
+incompatible dependency installations are used.
+
+The Ubuntu 20.04 build workflow records its exact source commit and runtime
+requirements alongside checksummed archives. Functional/build success must not
+be described as a clean dependency-security audit. The older assessment below
+is retained as historical evidence and does not supersede this result.
+
 ## Decision
 
 The audited release is suitable for publication with its existing Git history,

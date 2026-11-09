@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import logging
 import math
 from dataclasses import dataclass
 from pathlib import Path
@@ -7,17 +9,16 @@ from typing import Protocol
 
 import numpy as np
 from forge_kinematics import (
-    IKOptions,
-    IKRequest,
     IKStatus,
     KinematicGroup,
-    PinocchioDlsSolver,
-    PoseTarget,
     RobotModel,
 )
 from forge_msgs import Pose
 
 from .config import MotionGroupConfig, MotionServerConfig
+from .robust_ik import RobustIK
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,6 +26,7 @@ class InverseKinematicsOutcome:
     status: str
     message: str
     positions: tuple[float, ...] | None
+    diagnostics: dict | None = None
 
 
 class MotionKinematics(Protocol):
@@ -48,7 +50,7 @@ class _GroupRuntime:
     config: MotionGroupConfig
     model: RobotModel
     group: KinematicGroup
-    solver: PinocchioDlsSolver
+    solver: RobustIK
 
 
 class ForgeKinematicsAdapter:
@@ -72,7 +74,7 @@ class ForgeKinematicsAdapter:
                 config=group_config,
                 model=model,
                 group=group,
-                solver=PinocchioDlsSolver(group),
+                solver=RobustIK(group, group_config),
             )
         self._runtimes = runtimes
 
@@ -91,36 +93,23 @@ class ForgeKinematicsAdapter:
     ) -> InverseKinematicsOutcome:
         runtime = self._runtime(group_name)
         target_matrix = pose_to_matrix(target_pose)
-        context_state = runtime.model.create_state(
-            dict(zip(runtime.config.joint_names, seed_positions, strict=True))
+        numerical_position, numerical_orientation = runtime.solver.tolerances(
+            position_tolerance_m, orientation_tolerance_rad
         )
         result = runtime.solver.solve(
-            IKRequest(
-                seed=seed_positions,
-                targets=(
-                    PoseTarget(
-                        tip_frame=runtime.config.tip_frame,
-                        reference_frame=runtime.config.base_frame,
-                        pose=target_matrix,
-                    ),
-                ),
-                options=IKOptions(
-                    timeout_s=timeout_ns / 1_000_000_000.0,
-                    position_tolerance_m=position_tolerance_m,
-                    orientation_tolerance_rad=orientation_tolerance_rad,
-                    max_solution_joint_displacement=(
-                        runtime.config.ik_max_solution_joint_displacement
-                    ),
-                    allow_approximate_solution=False,
-                ),
-                context_state=context_state,
-            )
+            target_matrix,
+            seed_positions,
+            numerical_position,
+            numerical_orientation,
+            timeout_ns / 1_000_000_000.0,
         )
-        positions = None if result.solution is None else tuple(float(v) for v in result.solution)
+        logger.info("[motion_ik] %s", json.dumps(result.diagnostics, allow_nan=False))
+        positions = None if result.positions is None else tuple(float(v) for v in result.positions)
         return InverseKinematicsOutcome(
-            status=result.status.value,
+            status=result.status,
             message=result.message,
             positions=positions,
+            diagnostics=result.diagnostics,
         )
 
     def forward(self, group_name: str, positions: tuple[float, ...]) -> Pose:

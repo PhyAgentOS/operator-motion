@@ -8,11 +8,11 @@ on:
       ref:
         description: Git ref to build
         required: true
-        default: v0.1.0
+        default: v0.1.1
       version:
         description: Release version without the v prefix
         required: true
-        default: 0.1.0
+        default: 0.1.1
 
 permissions:
   contents: read
@@ -20,6 +20,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     container:
       image: ubuntu:20.04
     env:
@@ -49,36 +50,56 @@ jobs:
           uv --version
           uv run --no-project --python 3.12 python --version
 
+      - name: Verify source version
+        run: |
+          uv run --no-project --python 3.12 python - <<'PYCODE'
+          import os
+          from pathlib import Path
+          import tomllib
+          expected = os.environ["RELEASE_VERSION"]
+          for name in ("pyproject.toml", "packages/motion_server/pyproject.toml"):
+              actual = tomllib.loads(Path(name).read_text())["project"]["version"]
+              if actual != expected:
+                  raise SystemExit(f"{name}: expected {expected}, got {actual}")
+          PYCODE
+          git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD > release-source-commit.txt
+
       - name: Build with PyInstaller
         run: ./scripts/build_pyinstaller.sh
 
       - name: Verify and package binaries
         run: |
-          test "${{ inputs.ref }}" = "v${RELEASE_VERSION}"
           ./dist/motion_server --help >/dev/null
           ./dist/motion_action_policy --help >/dev/null
           file ./dist/motion_server ./dist/motion_action_policy
           ldd --version | sed -n '1p'
-          archive="forge-motion-v${RELEASE_VERSION}-ubuntu20.04-x86_64.tar.gz"
-          tar \
-            --sort=name \
-            --mtime='UTC 1970-01-01' \
-            --owner=0 \
-            --group=0 \
-            --numeric-owner \
-            -C dist \
-            -czf "${archive}" \
-            motion_server \
-            motion_action_policy
-          sha256sum "${archive}" > "${archive}.sha256"
-          tar -tzf "${archive}"
-          sha256sum --check "${archive}.sha256"
+          ./dist/motion_server --version
+          package() {
+            prefix="$1"
+            shift
+            archive="${prefix}-v${RELEASE_VERSION}-ubuntu20.04-x86_64.tar.gz"
+            tar --sort=name --mtime='UTC 1970-01-01' \
+              --owner=0 --group=0 --numeric-owner \
+              -C dist -czf "${archive}" "$@"
+            sha256sum "${archive}" > "${archive}.sha256"
+            tar -tzf "${archive}"
+            sha256sum --check "${archive}.sha256"
+          }
+          package forge-motion motion_server motion_action_policy
+          package motion-server motion_server
+          package motion-action-policy motion_action_policy
+          sha256sum *-v"${RELEASE_VERSION}"-ubuntu20.04-x86_64.tar.gz > SHA256SUMS.txt
+          uv export --frozen --format requirements-txt --no-dev \
+            --no-emit-project --no-emit-workspace --output-file release-requirements.txt >/dev/null
 
       - uses: actions/upload-artifact@v6
         with:
           name: forge-motion-v${{ inputs.version }}-ubuntu20.04-x86_64
           path: |
-            forge-motion-v${{ inputs.version }}-ubuntu20.04-x86_64.tar.gz
-            forge-motion-v${{ inputs.version }}-ubuntu20.04-x86_64.tar.gz.sha256
+            *-v${{ inputs.version }}-ubuntu20.04-x86_64.tar.gz
+            *-v${{ inputs.version }}-ubuntu20.04-x86_64.tar.gz.sha256
+            SHA256SUMS.txt
+            release-source-commit.txt
+            release-requirements.txt
           if-no-files-found: error
           retention-days: 30

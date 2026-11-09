@@ -3,7 +3,45 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from forge_motion_server.config import load_config, motion_server_config_from_mapping
+from forge_motion_server.config import (
+    MotionServerConfig,
+    load_config,
+    motion_server_config_from_mapping,
+)
+
+
+def test_omitted_ik_settings_load_the_validated_defaults() -> None:
+    mapping = _mapping()
+    mapping.pop("planning_timeout_ms")
+    config = motion_server_config_from_mapping(mapping)
+    group = config.groups["arm"]
+    assert config.planning_timeout_ns == 1_000_000_000
+    assert MotionServerConfig(groups=config.groups).planning_timeout_ns == 1_000_000_000
+    assert group.ik_position_tolerance_scale == 0.5
+    assert group.ik_position_tolerance_max_m == 0.002
+    assert group.ik_orientation_weight == 0.01
+    assert group.ik_damping == 0.1
+    assert group.ik_max_attempts == 8
+    assert group.ik_attempt_timeout_ms == 80
+    assert group.ik_seed_perturbation_rad == 0.35
+
+
+def test_explicit_ik_settings_override_defaults() -> None:
+    mapping = _mapping()
+    settings = {
+        "ik_position_tolerance_scale": 0.25,
+        "ik_position_tolerance_max_m": 0.001,
+        "ik_orientation_weight": 0.04,
+        "ik_damping": 0.05,
+        "ik_max_attempts": 3,
+        "ik_attempt_timeout_ms": 25,
+        "ik_seed_perturbation_rad": 0.1,
+    }
+    mapping["groups"]["arm"].update(settings)
+    config = motion_server_config_from_mapping(mapping)
+    assert config.planning_timeout_ns == 75_000_000
+    for name, value in settings.items():
+        assert getattr(config.groups["arm"], name) == value
 
 
 def _mapping() -> dict:

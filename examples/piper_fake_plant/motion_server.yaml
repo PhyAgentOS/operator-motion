@@ -1,5 +1,5 @@
 state_timeout_ms: 200
-planning_timeout_ms: 100
+planning_timeout_ms: 1000
 execution_timeout_margin_ms: 2000
 final_state_timeout_ms: 200
 child_cancel_retry_ms: 100
@@ -35,4 +35,11 @@ groups:
     final_joint_tolerance: 0.03
     final_position_tolerance_m: 0.01
     final_orientation_tolerance_rad: 0.05
-    ik_max_solution_joint_displacement: 0.50
+    ik_max_solution_joint_displacement: 8.0
+    ik_position_tolerance_scale: 0.5
+    ik_position_tolerance_max_m: 0.002
+    ik_orientation_weight: 0.01
+    ik_damping: 0.1
+    ik_max_attempts: 8
+    ik_attempt_timeout_ms: 80
+    ik_seed_perturbation_rad: 0.35

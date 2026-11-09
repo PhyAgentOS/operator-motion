@@ -14,6 +14,7 @@ They retain their respective licenses:
 - `forge-msgs`: Apache-2.0
 - `forge-kinematics`: Apache-2.0
 - `numpy`: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0
+- `scipy`: BSD-3-Clause
 - `pyarrow`: Apache-2.0
 - `pinocchio`: MIT
 - `PyYAML`: MIT

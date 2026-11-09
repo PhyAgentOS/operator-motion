@@ -1,0 +1,231 @@
+{
+  "group_name": "piper_arm",
+  "seed_rad": [
+    0,
+    0,
+    0,
+    0,
+    0.3,
+    0
+  ],
+  "stage_limits": {
+    "prepare": {
+      "position_m": 0.025,
+      "z_m": 0.015,
+      "orientation_rad": 0.2
+    },
+    "hover": {
+      "position_m": 0.01,
+      "z_m": 0.006,
+      "orientation_rad": 0.15
+    },
+    "descend": {
+      "position_m": 0.005,
+      "z_m": 0.003,
+      "orientation_rad": 0.1
+    },
+    "lift": {
+      "position_m": 0.008,
+      "z_m": 0.005,
+      "orientation_rad": 0.15
+    },
+    "transit": {
+      "position_m": 0.015,
+      "z_m": 0.01,
+      "orientation_rad": 0.2
+    },
+    "place": {
+      "position_m": 0.005,
+      "z_m": 0.003,
+      "orientation_rad": 0.1
+    },
+    "retreat": {
+      "position_m": 0.02,
+      "z_m": 0.01,
+      "orientation_rad": 0.2
+    }
+  },
+  "waypoints": [
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "hover",
+      "target_pose": {
+        "qw": 0.0,
+        "qx": 0.707107,
+        "qy": 0.707107,
+        "qz": 0.0,
+        "x": 0.3227,
+        "y": 0.1546,
+        "z": 0.0806
+      },
+      "xyz": [
+        0.3227,
+        0.1546,
+        0.2156
+      ]
+    },
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "descend",
+      "target_pose": {
+        "qw": 0.0,
+        "qx": 0.707107,
+        "qy": 0.707107,
+        "qz": 0.0,
+        "x": 0.3227,
+        "y": 0.1546,
+        "z": 0.0406
+      },
+      "xyz": [
+        0.3227,
+        0.1546,
+        0.1756
+      ]
+    },
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "lift",
+      "target_pose": {
+        "qw": 0.0,
+        "qx": 0.0,
+        "qy": 1.0,
+        "qz": 0.0,
+        "x": 0.3227,
+        "y": 0.1546,
+        "z": 0.0956
+      },
+      "xyz": [
+        0.3227,
+        0.1546,
+        0.2306
+      ]
+    },
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "swing",
+      "target_pose": {
+        "qw": 0.3349847488286374,
+        "qx": 0.0,
+        "qy": 0.9396926207859084,
+        "qz": -0.06901446582221521,
+        "x": 0.4479,
+        "y": 0.098,
+        "z": 0.19
+      },
+      "xyz": [
+        0.4479,
+        0.098,
+        0.325
+      ]
+    },
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "retract",
+      "target_pose": {
+        "qw": 0.3349847488286374,
+        "qx": 0.0,
+        "qy": 0.9396926207859084,
+        "qz": -0.06901446582221521,
+        "x": 0.3227,
+        "y": 0.1546,
+        "z": 0.19
+      },
+      "xyz": [
+        0.3227,
+        0.1546,
+        0.325
+      ]
+    },
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "prehome",
+      "target_pose": {
+        "qw": 0.580977,
+        "qx": -0.008504,
+        "qy": 0.813826,
+        "qz": 0.008936,
+        "x": 0.16,
+        "y": 0.0,
+        "z": 0.22
+      },
+      "xyz": [
+        0.16,
+        0.0,
+        0.355
+      ]
+    },
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "home",
+      "target_pose": {
+        "qw": 0.580977,
+        "qx": -0.008504,
+        "qy": 0.813826,
+        "qz": 0.008936,
+        "x": 0.1763,
+        "y": 0.0068,
+        "z": 0.1169
+      },
+      "xyz": [
+        0.1763,
+        0.0068,
+        0.2519
+      ]
+    }
+  ],
+  "start_waypoints": [
+    {
+      "gripper": {
+        "close_gap": 0.02,
+        "hold_threshold": 0.0261,
+        "open_gap": 0.1
+      },
+      "name": "park",
+      "target_pose": {
+        "qw": 0.0,
+        "qx": 0.707107,
+        "qy": 0.707107,
+        "qz": 0.0,
+        "x": 0.2538,
+        "y": -0.0017,
+        "z": 0.11
+      },
+      "velocity_scale": 0.5,
+      "xyz": [
+        0.2538,
+        -0.0017,
+        0.245
+      ]
+    }
+  ],
+  "drop": true,
+  "timeout_s": 12
+}

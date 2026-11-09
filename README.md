@@ -39,11 +39,15 @@ Gateway -> motion_action_policy -> motion_server -> joint_trajectory_controller 
 
 `motion_action_policy` handles the Tool lifecycle and Wire argument translation;
 `motion_server` handles fresh state, FK/IK, trajectories and controller orchestration.
+Version 0.1.1 uses bounded local IK fallback and separates numerical position
+accuracy from physical completion tolerance. A hardware-free JSON-lines
+preflight helper is available as `python -m forge_motion_server.route_preflight`;
+it adds no production Node, Endpoint or Tool operation.
 They are separate Nodes: the word `server` in the Endpoint ID does not route the provider to the compute Node.
 For arguments, units and validation, see the [Action endpoint](packages/motion_server/src/forge_motion_server/action_endpoint.py)
 and [motion_server package guide](packages/motion_server/README.md). Joint values use rad/m according to joint type; pose positions use metres.
 
-Compatibility: current dependency declarations are `dora-rs==0.4.1`, `forge-kinematics==1.0.1`, `forge-msgs==1.0.1`. See [pyproject.toml](packages/motion_server/pyproject.toml) and [uv.lock](uv.lock). The Tool protocol implementation is vendored in this repository. These declarations do not guarantee cross-version interoperability; also check the build revision and Skill lock when using artifacts.
+Compatibility: current dependency declarations are `dora-rs==0.4.1`, `forge-kinematics==1.0.1`, `forge-msgs==1.0.1`, and `scipy>=1.14,<2`. See [pyproject.toml](packages/motion_server/pyproject.toml) and [uv.lock](uv.lock). The Tool protocol implementation is vendored in this repository. These declarations do not guarantee cross-version interoperability; also check the build revision and Skill lock when using artifacts.
 
 Changes to Node entrypoints, Endpoints or Tool APIs must update this section and the associated configuration/contracts. Follow the [Node README contract](https://github.com/PhyAgentOS/forge/blob/master/CONTRIBUTING.md#node-readme-contract).
 
@@ -58,6 +62,16 @@ Changes to Node entrypoints, Endpoints or Tool APIs must update this section and
 Motion determines how a configured kinematic group reaches a joint or Cartesian target. It does not
 contain object/manipulation semantics, hardware protocols, motor loops, or low-level
 `JointCommand` generation.
+The optional preflight helper interprets application waypoint labels outside the
+MotionServer action core. It checks sequential IK and sampled TCP height, and
+does not provide whole-robot collision checking.
+
+The default planning budget is 1000 ms. Numerical IK position tolerance is
+`min(completion_position_tolerance * 0.5, 0.002)` metres, with orientation cost
+weight 0.01 and DLS damping 0.1. Up to eight numerical attempts, each limited to
+80 ms, share the planning budget. These settings are defaults when omitted;
+explicit configuration overrides them. See the [configuration and fallback
+guide](packages/motion_server/README.md#ik-defaults-and-fallback).
 
 See `examples/piper_fake_plant/` for the full Piper fake-plant integration smoke.
 
@@ -73,6 +87,19 @@ PYTHONPATH=src uv run pytest -q
 `PYTHONPATH=src` exposes the vendored `forge-tool` protocol under
 `src/forge_tool`; see `THIRD_PARTY_NOTICES.md` for its provenance. Optional
 standalone executables can be built with `scripts/build_pyinstaller.sh`.
+
+## Linux release artifacts
+
+The manual **Build Ubuntu 20.04 binaries** workflow accepts a commit, branch or tag
+in `ref` and checks that both package versions match `version`. It builds and
+checks both CLIs in Ubuntu 20.04, then uploads the combined archive and separate
+single-executable archives for `motion_server` and `motion_action_policy`.
+Release assets also include SHA-256 checksums, the exact source commit and frozen
+runtime requirements. Use the separate archives for single-node installation;
+the combined archive contains both programs. Build success does not imply that
+the independent dependency audit passed. Version 0.1.1 retains an inherited
+Pillow 12.3.0 dependency whose audit currently fails; see the
+[verification update](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09).
 
 ## License
 
