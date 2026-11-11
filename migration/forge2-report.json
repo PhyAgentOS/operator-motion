@@ -1,0 +1,105 @@
+{
+  "repository": "operator-motion",
+  "node_candidate_version": "2.0.0",
+  "baseline_commit": "094036617d3a7af2fdf855b8f06033e258d21786",
+  "changes": [
+    "Upgrade workspace and Motion Server/Action Policy entrypoints.",
+    "Remove vendored Tool and source-path injection; use public ToolMessage.",
+    "Synchronize English/Chinese root README guidance and frozen dependencies."
+  ],
+  "software_tests": {
+    "log": "tests.log",
+    "summary": [
+      "48 passed in 1.28s"
+    ]
+  },
+  "dora_cli": "1.0.1",
+  "runtime_records": [
+    {
+      "repo": "operator-motion",
+      "entry": "motion-server",
+      "mode": "single",
+      "command": [
+        "${WORKSPACE}/.test-env/bin/dora",
+        "run",
+        "${WORKSPACE}/validation/forge2/runtime/motion-server/single/dataflow.yaml",
+        "--stop-after",
+        "6s"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.123,
+      "passed": true,
+      "error": null,
+      "scope": "Startup, timer processing and normal Dora stop only; no hardware or action execution."
+    },
+    {
+      "repo": "operator-motion",
+      "entry": "motion-action-policy",
+      "mode": "single",
+      "command": [
+        "${WORKSPACE}/.test-env/bin/dora",
+        "run",
+        "${WORKSPACE}/validation/forge2/runtime/motion-action-policy/single/dataflow.yaml",
+        "--stop-after",
+        "6s"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.142,
+      "passed": true,
+      "error": null,
+      "scope": "Startup, timer processing and normal Dora stop only; no hardware or action execution."
+    },
+    {
+      "repo": "operator-motion",
+      "entry": "motion-action-policy",
+      "command": [
+        "${WORKSPACE}/.test-env/bin/dora",
+        "run",
+        "${WORKSPACE}/validation/forge2/runtime/motion-action-policy/chain/dataflow.yaml",
+        "--stop-after",
+        "10s"
+      ],
+      "includes_gateway": true,
+      "passed": true,
+      "scope": "Real Tool provider registration and registry response over Dora; HTTP discovery confirms the endpoint. No hardware/action execution.",
+      "discovery": {
+        "ok": true,
+        "data": {
+          "revision": 1,
+          "tools": [
+            {
+              "endpoint_id": "motion.server",
+              "descriptor": {
+                "protocol_version": "forge.tool.endpoint/v1alpha1",
+                "endpoint_id": "motion.server",
+                "operations": [
+                  {
+                    "name": "move_joints",
+                    "semantics": "action",
+                    "cancellable": true,
+                    "stoppable": false,
+                    "status_supported": true,
+                    "max_concurrency": 1
+                  },
+                  {
+                    "name": "move_pose",
+                    "semantics": "action",
+                    "cancellable": true,
+                    "stoppable": false,
+                    "status_supported": true,
+                    "max_concurrency": 1
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "exit_code": 0
+    }
+  ],
+  "runtime_missing": "Motion Server standalone startup passed; chained runtime covers the Action Policy registration, not the complete Motion Server/controller action execution.",
+  "acceptance": "Pending final platform artifacts, applicable hardware/model execution and rollback/sustained-run gates.",
+  "pillow_dependency": "Node locks currently resolve published Forge Msgs 2.0.0. Security audit remains dependent on Forge PR #3 and a published security-fixed Msgs release; no vulnerability suppression was added.",
+  "gitlab_synchronization": "Not started; follows full acceptance."
+}

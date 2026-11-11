@@ -44,7 +44,7 @@ Gateway -> motion_action_policy -> motion_server -> joint_trajectory_controller 
 参数、单位与校验以 [Action endpoint](packages/motion_server/src/forge_motion_server/action_endpoint.py)
 和 [motion_server 包说明](packages/motion_server/README.md)为准；关节值按关节类型使用 rad/m，位姿位置为 m。
 
-兼容性：当前依赖声明为 `dora-rs==0.4.1`、`forge-kinematics==1.0.1`、`forge-msgs==1.0.1`、`scipy>=1.14,<2`；以 [pyproject.toml](packages/motion_server/pyproject.toml) 与 [uv.lock](uv.lock) 为准。 Tool 协议实现为仓库内 vendored 代码。 这些声明不构成跨版本互操作保证；使用制品时还需核对 build revision 和 Skill lock。
+兼容性：当前依赖声明为 `dora-rs>=1.0.1,<2`、`forge-kinematics>=2.0.0,<3`、`forge-msgs>=2.0.0,<3`、`scipy>=1.14,<2`；以 [pyproject.toml](packages/motion_server/pyproject.toml) 与 [uv.lock](uv.lock) 为准。 Tool 协议实现来自正式 `forge-tool[dora]` 分发包。 这些声明不构成跨版本互操作保证；使用制品时还需核对 build revision 和 Skill lock。
 
 后续修改 Node 入口、Endpoint 或 Tool API 时，请同步更新本节及对应配置/契约，遵循 [Node README 规范](https://github.com/PhyAgentOS/forge/blob/master/CONTRIBUTING.md#node-readme-contract)。
 
@@ -76,7 +76,7 @@ uv sync --frozen --all-groups
 PYTHONPATH=src uv run pytest -q
 ```
 
-`PYTHONPATH=src` 暴露 `src/forge_tool` 中内置的 Tool 协议；来源见 `THIRD_PARTY_NOTICES.md`。
+Tool 协议由正式 `forge-tool[dora]` 分发包提供；`THIRD_PARTY_NOTICES.md` 保留旧副本的来源记录。
 可选独立可执行文件通过 `scripts/build_pyinstaller.sh` 构建。
 
 ## Linux 发布制品
@@ -94,3 +94,9 @@ PYTHONPATH=src uv run pytest -q
 本仓库使用 [Apache License 2.0](LICENSE)。运行时依赖不随源码仓库分发，
 保留各自许可证，详见 [NOTICE](NOTICE) 与 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 发布独立可执行文件前审查完整打包制品。
+
+## Forge 2.x 迁移
+
+本分支准备节点版本 `2.0.0`，适配 Dora 1.x，迁移验证锁定 Dora `1.0.1`。使用正式 Forge 2.x 分发包；Common 至少为 `2.1.0`。此次更新包括依赖锁文件与各独立可执行入口。
+
+每轮报告必须列出仓库、改动和测试证据，包括各节点的 `dora run` 记录，以及包含 `adapter-forge-gateway` 的串联测试。缺少硬件或模型的验收项保持待验证。源码 PR 不等于正式发布；整体验收通过后再同步 GitLab。
