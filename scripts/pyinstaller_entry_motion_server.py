@@ -4,12 +4,11 @@ import cmeel
 import dora
 import forge_kinematics
 import forge_msgs
+import forge_tool
 import numpy
 import pinocchio
 import yaml
 from forge_motion_server.main import main
-
-import forge_tool
 
 _BUNDLED_DEPENDENCIES = (
     cmeel,

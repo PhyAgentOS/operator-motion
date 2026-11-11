@@ -1,7 +1,6 @@
 {
   "repository": "operator-motion",
   "node_candidate_version": "2.0.0",
-  "baseline_commit": "094036617d3a7af2fdf855b8f06033e258d21786",
   "changes": [
     "Upgrade workspace and Motion Server/Action Policy entrypoints.",
     "Remove vendored Tool and source-path injection; use public ToolMessage.",
