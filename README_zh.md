@@ -2,6 +2,14 @@
 
 [English](README.md) | [简体中文](README_zh.md)
 
+## BREAKING CHANGE：Forge 2.x / Dora 1.x 迁移
+
+本次从 Forge 1.x / Dora 0.4.x 升级需要协同部署。节点对接前必须对齐 Forge 包、Dora CLI/coordinator/daemon、本节点及上下游节点的版本；不支持在 Forge 1.x 部署中只替换单个节点。可执行产物也需要使用匹配环境重新构建和部署。仍使用旧技术栈的部署请保留在 `stable/1.x`。
+
+本轮验证的 Python 基线为 `forge-msgs==2.1.0`、`Pillow==13.0.0`、`forge-common==2.1.0`、按需使用的 `forge-robot` / `forge-policy` / `forge-kinematics` / `forge-tool` 为 `2.0.0`，以及 `dora-rs==1.0.1`。同时遵守本仓库的 Python 和 SDK 平台要求。Forge 各包族独立发布，无需强行使用同一个版本号。Rust 节点继续使用已发布的 `forge_msgs` crate `2.0.0` 和 Dora `1.0.1`；Python Msgs `2.1.0` 不要求升级到尚未发布的 Rust `2.1.0`。消息命名空间 `forge_msgs.v1` 保持不变。
+
+这里的 breaking change 指旧技术栈的部署迁移，不代表真机、真实模型或长时间运行已完成验收。实际测试和未完成项见[本轮验证报告](migration/msgs-2.1.0-report.json)。
+
 面向 Forge 机器人的 Dora 原生运动规划与执行编排。
 
 ```text
@@ -86,8 +94,8 @@ Tool 协议由正式 `forge-tool[dora]` 分发包提供；`THIRD_PARTY_NOTICES.m
 输出包括合并压缩包，以及分别仅包含 `motion_server`、`motion_action_policy` 的单可执行文件压缩包。
 发布附件同时包含 SHA-256 校验值、精确源码提交和锁定的运行依赖清单。
 单 Node 安装使用独立压缩包，合并包包含两个程序。构建成功不代表独立的依赖审计已通过。
-0.1.1 保留了已有的 Pillow 12.3.0 依赖，当前依赖审计未通过，详见
-[验证更新](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09)。
+0.1.1 的 Pillow 12.3.0 限制已在本 Forge 2.x 分支通过 Msgs 2.1.0 / Pillow 13.0.0 解除。
+本轮结果见上方报告；[此前验证更新](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09) 保留为历史记录。
 
 ## 许可证
 

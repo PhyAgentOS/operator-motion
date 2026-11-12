@@ -2,6 +2,14 @@
 
 [English](README.md) | [简体中文](README_zh.md)
 
+## BREAKING CHANGE: Forge 2.x / Dora 1.x migration
+
+This migration from Forge 1.x / Dora 0.4.x requires coordinated deployment. Align the Forge packages, Dora CLI/coordinator/daemon, this node and its peer nodes before connecting a dataflow; replacing only one node in a Forge 1.x deployment is unsupported. Rebuild and redeploy executable artifacts with the matching environment. Keep `stable/1.x` for deployments that still use the previous stack.
+
+The validated Python baseline is `forge-msgs==2.1.0`, `Pillow==13.0.0`, `forge-common==2.1.0`, the applicable `forge-robot` / `forge-policy` / `forge-kinematics` / `forge-tool` packages at `2.0.0`, and `dora-rs==1.0.1`. Respect this repository's Python and SDK platform requirements. Forge package families have independent versions. Rust nodes retain the published `forge_msgs` crate `2.0.0` with Dora `1.0.1`; Python Msgs `2.1.0` does not require a nonexistent Rust `2.1.0` release. The `forge_msgs.v1` message namespace remains unchanged.
+
+This notice describes the deployment break from the previous stack; it does not declare hardware, real-model or sustained-run acceptance complete. See [this round's verification report](migration/msgs-2.1.0-report.json) for actual tests and outstanding gates.
+
 Dora-native motion planning and execution orchestration for Forge robots.
 
 ```text
@@ -96,9 +104,10 @@ single-executable archives for `motion_server` and `motion_action_policy`.
 Release assets also include SHA-256 checksums, the exact source commit and frozen
 runtime requirements. Use the separate archives for single-node installation;
 the combined archive contains both programs. Build success does not imply that
-the independent dependency audit passed. Version 0.1.1 retains an inherited
-Pillow 12.3.0 dependency whose audit currently fails; see the
-[verification update](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09).
+the independent dependency audit passed. The inherited Pillow 12.3.0
+restriction recorded for version 0.1.1 is resolved on this Forge 2.x branch
+by Msgs 2.1.0 / Pillow 13.0.0. See this round's report above; the
+[earlier verification update](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09) is historical.
 
 ## License
 

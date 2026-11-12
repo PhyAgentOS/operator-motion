@@ -1,0 +1,8 @@
+Resolved 2 packages in 7ms
+Prepared 1 package in 430ms
+Uninstalled 2 packages in 35ms
+Installed 2 packages in 10ms
+ - forge-msgs==2.0.0
+ + forge-msgs==2.1.0
+ - pillow==12.3.0
+ + pillow==13.0.0
