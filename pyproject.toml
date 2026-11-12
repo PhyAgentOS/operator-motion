@@ -1,6 +1,6 @@
 [project]
 name = "forge-motion"
-version = "0.1.1"
+version = "2.0.0"
 description = "Motion planning and execution orchestration for Forge robotics dataflows."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -34,11 +34,6 @@ pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 100
-extend-exclude = ["src/forge_tool"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-
-[tool.ruff.lint.per-file-ignores]
-# The package init prepends the vendored forge_tool source path before imports.
-"packages/motion_server/src/forge_motion_server/__init__.py" = ["E402"]

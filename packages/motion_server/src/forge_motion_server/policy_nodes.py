@@ -17,10 +17,9 @@ from forge_msgs import (
     MovePoseFeedback,
     MovePoseGoal,
     MovePoseResult,
+    ToolMessage,
 )
-
 from forge_tool import ToolEndpointHandler, ToolEnvelope
-from forge_tool._tool_message import ToolMessage
 from forge_tool.dora import (
     DoraToolEndpointBinding,
     tool_envelope_to_message,

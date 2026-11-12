@@ -25,7 +25,6 @@ from forge_msgs import (
     MovePoseResult,
     Pose,
 )
-
 from forge_tool import (
     TOOL_ENDPOINT_PROTOCOL,
     ToolAccepted,
