@@ -96,8 +96,7 @@
       "forge-msgs": "2.1.0",
       "pillow": "13.0.0",
       "dora-rs": "1.0.1"
-    },
-    "log": "msgs-2.1.0-logs/tests-retry.log"
+    }
   },
   "dependency_audit": {
     "repo": "operator-motion",
@@ -128,7 +127,7 @@
       "scope": "MotionServer plus Gateway startup/timer/normal stop only. No trajectory goal or full controller execution asserted.",
       "source_report": "runtime/motion-server/chain/report.json",
       "runtime_errors": [],
-      "log": "msgs-2.1.0-logs/runtime/motion-server/chain/dora.log"
+      "local_evidence": "Full original Dora log is retained under validation/downstream-msgs210-20261112/runtime/motion-server/chain/dora.log"
     },
     {
       "repo": "operator-motion",
@@ -148,7 +147,7 @@
       "scope": "Startup, timer processing and normal Dora stop only; no hardware or action execution.",
       "source_report": "runtime/motion-server/single/report.json",
       "runtime_errors": [],
-      "log": "msgs-2.1.0-logs/runtime/motion-server/single/dora.log"
+      "local_evidence": "Full original Dora log is retained under validation/downstream-msgs210-20261112/runtime/motion-server/single/dora.log"
     },
     {
       "repo": "operator-motion",
@@ -200,7 +199,7 @@
       "mode": "chain",
       "source_report": "runtime/motion-action-policy/chain/report.json",
       "runtime_errors": [],
-      "log": "msgs-2.1.0-logs/runtime/motion-action-policy/chain/dora.log"
+      "local_evidence": "Full original Dora log is retained under validation/downstream-msgs210-20261112/runtime/motion-action-policy/chain/dora.log"
     },
     {
       "repo": "operator-motion",
@@ -220,10 +219,11 @@
       "scope": "Startup, timer processing and normal Dora stop only; no hardware or action execution.",
       "source_report": "runtime/motion-action-policy/single/report.json",
       "runtime_errors": [],
-      "log": "msgs-2.1.0-logs/runtime/motion-action-policy/single/dora.log"
+      "local_evidence": "Full original Dora log is retained under validation/downstream-msgs210-20261112/runtime/motion-action-policy/single/dora.log"
     }
   ],
   "remaining": "Action-policy registration and MotionServer startup with Gateway only; full MotionServer goal/controller closed loop remains pending.",
   "acceptance": "Pending; software checks, fake/dummy backends and negative prerequisite records are scoped evidence only. Every new multi-node graph contains adapter-forge-gateway.",
-  "gitlab_sync": "Not performed; follows completed acceptance."
+  "gitlab_sync": "Not performed; follows completed acceptance.",
+  "log_publication": "Original logs remain in the local validation workspace. This public report publishes reviewed commands, outcomes, assertions and limitations only."
 }
