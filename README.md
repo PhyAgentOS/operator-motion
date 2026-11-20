@@ -88,22 +88,40 @@ PYTHONPATH=src uv run pytest -q
 `src/forge_tool`; see `THIRD_PARTY_NOTICES.md` for its provenance. Optional
 standalone executables can be built with `scripts/build_pyinstaller.sh`.
 
-## Linux release artifacts
-
-The manual **Build Ubuntu 20.04 binaries** workflow accepts a commit, branch or tag
-in `ref` and checks that both package versions match `version`. It builds and
-checks both CLIs in Ubuntu 20.04, then uploads the combined archive and separate
-single-executable archives for `motion_server` and `motion_action_policy`.
-Release assets also include SHA-256 checksums, the exact source commit and frozen
-runtime requirements. Use the separate archives for single-node installation;
-the combined archive contains both programs. Build success does not imply that
-the independent dependency audit passed. Version 0.1.1 retains an inherited
-Pillow 12.3.0 dependency whose audit currently fails; see the
-[verification update](OPEN_SOURCE_AUDIT.md#011-verification-update-2026-11-09).
-
 ## License
 
 [Apache License 2.0](LICENSE). Runtime dependencies are not distributed with
 this source repository and retain their respective licenses; see
 [NOTICE](NOTICE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 Review the complete bundled artifact before publishing standalone executables.
+
+## Versioned releases
+
+**Mandatory tag-first release rule:** merge the version/lock change, create an annotated version tag on that reviewed commit, build that exact tag, validate the artifacts, then publish. Moving branch names, untagged commit IDs and replacement of published tags are not release inputs.
+
+| Release line | Source | Node/package version | Runtime |
+| --- | --- | --- | --- |
+| Forge 1.x | `stable/1.x` | `1.x`, tag `v1.X.Y` | Forge 1.x / Dora 0.4.x |
+| Forge 2.x | `master` | `2.x`, tag `v2.X.Y` | Forge 2.x / Dora 1.x |
+
+**Legacy normalization:** nodes previously at 0.x on `stable/1.x` release as **1.0.0**, retaining Forge 1.x / Dora 0.4.x dependencies and runtime behavior. Existing 1.x package versions are retained. Node/package majors now follow the Forge compatibility line; a 0.x tag is rejected.
+
+Run **Build versioned release** from `master` for either line. First merge the version/lock changes into the selected source branch, then create an unused **annotated** tag on that reviewed commit. The tag must match package metadata. Never move existing tags or reuse a published version. Dispatch uses the workflow's reviewed tooling with the exact tagged source, so legacy tags need not contain the new release helper.
+
+```bash
+# Replace with an existing, reviewed and unpublished tag matching source metadata.
+TAG=v1.0.0
+gh workflow run release.yml --ref master -f release_line=1.x -f tag="$TAG"
+TAG=v2.X.Y
+gh workflow run release.yml --ref master -f release_line=2.x -f tag="$TAG"
+```
+
+The workflow verifies tag type, source commit, branch ancestry, source version and locked Forge/Dora compatibility. It builds source archives and wheel/sdist where supported, checks Python distribution metadata and SHA-256, and creates or attaches to a **draft GitHub Release**. Published releases/assets are not overwritten; review all build results and acceptance evidence before publishing. This workflow does not publish node packages to PyPI.
+
+Set `build_binaries=true` to call the existing Ubuntu 20.04 binary workflow; its existing architecture, CLI and archive checks remain in force. You can also run `build-ubuntu20.yml` directly with `ref`, `version` and `release_line`; `ref` must be an annotated tag, not a moving branch. Binary artifacts are attached only after all selected jobs succeed.
+
+The source archive preserves the tagged tree; external SDKs/submodules, model downloads and site configuration remain separate prerequisites. A dependency or SDK build failure is not successful release acceptance. Build success does not establish single-node or Gateway-chain `dora run`, hardware, real-model, sustained-run or rollback acceptance. Every acceptance chain must include `adapter-forge-gateway` from the same compatibility line. Forge 2.x is a **breaking change**: align Forge libraries, node versions and Dora across the entire deployment; keep 1.x on its maintenance branch.
+
+## Dependency maintenance
+
+This maintenance line uses Forge Msgs 1.3.1 and Pillow 13 while retaining Forge 1.x and Dora 0.4.x compatibility. Dependency vulnerability auditing remains enabled.
