@@ -7,7 +7,6 @@
 - [ ] `uv sync --frozen --all-groups` succeeds.
 - [ ] `PYTHONPATH=src uv run pytest -q` passes.
 - [ ] Motion CLI help checks pass.
-- [ ] Locked runtime dependencies pass `pip-audit`.
 - [ ] No secrets, recordings, machine paths, or private repository URLs are included.
 - [ ] License notices are updated when dependencies or bundled resources change.
 
