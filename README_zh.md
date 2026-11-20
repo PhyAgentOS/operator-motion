@@ -94,3 +94,7 @@ PYTHONPATH=src uv run pytest -q
 本仓库使用 [Apache License 2.0](LICENSE)。运行时依赖不随源码仓库分发，
 保留各自许可证，详见 [NOTICE](NOTICE) 与 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 发布独立可执行文件前审查完整打包制品。
+
+## CI 策略
+
+本分支不再维护自动依赖漏洞审计，也不将其作为 CI 或合并门槛。现有测试、构建及其他检查继续保留。移除审计门槛不改变锁定依赖，也不代表此前报告的漏洞已修复。
